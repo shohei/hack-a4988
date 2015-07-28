@@ -1,0 +1,9 @@
+PWD /Users/shohei/Downloads/hack-a4988/tex
+INPUT /usr/local/texlive/texmf-local/web2c/texmf.cnf
+INPUT /usr/local/texlive/2014/texmf.cnf
+INPUT /usr/local/texlive/2014/texmf-dist/web2c/texmf.cnf
+INPUT /usr/local/texlive/2014/texmf-var/web2c/pdftex/pdflatex.fmt
+INPUT main.tex
+OUTPUT main.log
+INPUT /usr/local/texlive/2014/texmf-dist/tex/platex/jsclasses/jsarticle.cls
+INPUT /usr/local/texlive/2014/texmf-dist/tex/platex/jsclasses/jsarticle.cls
