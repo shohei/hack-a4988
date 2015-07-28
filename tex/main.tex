@@ -1,6 +1,30 @@
 \documentclass[]{jsarticle}
 
 \usepackage[dvipdfmx]{graphicx}
+\usepackage{listings,jlisting}
+\usepackage{here}
+\usepackage{txfonts}
+\AtBeginDocument{\RequirePackage{lmodern, times}}
+
+\lstset{%
+  language={Python},
+  basicstyle={\small},%
+  identifierstyle={\small},%
+  commentstyle={\small\itshape},%
+  keywordstyle={\small\bfseries},%
+  ndkeywordstyle={\small},%
+  stringstyle={\small\ttfamily},
+  frame={tb},
+  breaklines=true,
+  columns=[l]{fullflexible},%
+  numbers=left,%
+  xrightmargin=0zw,%
+  xleftmargin=3zw,%
+  numberstyle={\scriptsize},%
+  stepnumber=1,
+  numbersep=1zw,%
+  lineskip=-0.5ex%
+}
 
 \begin{document}
 \title{A4988をMOSFET代わりに使うハックのアイディア}
@@ -88,35 +112,53 @@ G(s)F(s) & = & \frac{1}{CRs+1} \cdot \frac{1}{s^{2}+\omega^{2}} \\
              & = & \frac{1}{CR} \cdot \left( s - \frac{1}{CR} \right) \cdot \frac{1}{s^{2} - \left( \frac{1}{CR} \right) ^{2}} \cdot \frac{1}{s^{2}+\omega^{2}} \\
              & = & \frac{1}{CR} \left( s - k \right) \cdot \left( \frac{1}{s^{2}-k^{2}} - \frac{1}{s^{2}+\omega^{2}} \right) \cdot \frac{1}{\omega^{2} - k^{2}} \\
              & = & \frac{1}{CR} \left( s - k \right) \cdot \left( \frac{1}{s^{2}-k^{2}} - \frac{1}{s^{2}+\omega^{2}} \right) \cdot \frac{1}{\omega^{2} - k^{2}} \\
-             
+             & = & \frac{1}{CR} \left( \frac{1}{s+k} - \frac{s-k}{s^{2}+\omega^{2}}\right) \cdot \frac{1}{\omega^{2} - k^{2}} \\
+             & = & \frac{k}{\omega^{2}-k^{2}}\left( \frac{1}{s+k} - \frac{s}{s^{2}+\omega^{2}} + \frac{k}{s^{2}+\omega^{2}}\right)
 \end{eqnarray*}
 
+ラプラス逆変換して、
+\begin{eqnarray*}
+v_{o}(t) = L^{-1}[G(s)F(s)] = \frac{k}{\omega^{2}-k^{2}}\left( e^{-kt} + cos(\omega t) + k sin(\omega t)\right)
+\end{eqnarray*}
 
+$R = 1 [k \Omega], C=1,10,100,100[\mu F] $で計算するコードをソースコード\ref{code}に示す。
+
+\begin{lstlisting}[caption=正弦波入力に対する応答解析,label=code]
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+
+from pylab import *
+
+C_array = [1.0*10**-6,10.0*10**-6,100.0*10**-6,1000.0*10**-6] #[F]
+R = 1000.0 #[Ω]
+f = 100 # [Hz], 100 pulse per sec
+omega = f / (2.0*pi) #[rad/s]
+
+yscale('log')
+for C in C_array:
+    response = [] 
+    k = 1/(C*R)
+    t = arange(0,10,0.001)
+    response = k*(omega**2-k**2)*(exp(-1.0*k*t) - cos(omega*t) - k*sin(omega*t))
+    plot(t,response)
+
+show()
+\end{lstlisting}
+
+出力結果を図\ref{result}に示す。
+\begin{figure}
+\centering
+\includegraphics[width=130mm]{./image/result.pdf}
+\caption{計算結果}
+\label{result}
+\end{figure}
+
+図\ref{result}を見る限りでは入力は減衰されていない。
+
+\section{議論}
+\begin{itemize}
+\item 計算式の見直し
+\item パラメータの変更
+\end{itemize}
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

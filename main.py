@@ -18,4 +18,5 @@ for C in C_array:
     response = k*(omega**2-k**2)*(exp(-1.0*k*t) - cos(omega*t) - k*sin(omega*t))
     plot(t,response)
 
+savefig('result.pdf')
 show()
